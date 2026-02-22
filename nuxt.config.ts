@@ -1,10 +1,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-02-01',
   devtools: { enabled: true },
-  modules: [
-    '@nuxt/content',
-    // '@nuxtjs/tailwindcss'
-  ],
+  modules: ['@nuxt/content'],
   content: {
     documentDriven: false,
     markdown: {
@@ -13,6 +10,11 @@ export default defineNuxtConfig({
         searchDepth: 3
       }
     }
+  },
+  nitro: {
+    prerender: {
+      failOnError: false,
+    },
   },
   hooks: {
     async 'nitro:config'(nitroConfig) {

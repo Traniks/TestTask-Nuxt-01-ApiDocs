@@ -1,8 +1,4 @@
-/**
- * Краткие описания для меню документации (рус.).
- * Ключи — точные url_name из API. Приоритет: сначала здесь, если нет — summary из API (англ.).
- */
-
+/** Ключи = url_name из API. Нет ключа → берётся summary из API. */
 export const sectionDescriptions: Record<string, string> = {
   address_hints: 'Подсказки по адресам и геолокации',
   auth: 'Авторизация и OTP',

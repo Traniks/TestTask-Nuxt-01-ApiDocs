@@ -1,7 +1,4 @@
-/**
- * Серверный эндпоинт: один раз запрашивает внешний API, отдаёт данные.
- * При SSG (generate) кэширует ответ в памяти — внешний API вызывается один раз за сборку.
- */
+/** Прокси appload; при generate не используется (данные из staticData). */
 const APPLOAD_URL = 'https://main.nointerest.ru/api/appload'
 const APPLOAD_BODY = {
   detalize_mode: 'full',

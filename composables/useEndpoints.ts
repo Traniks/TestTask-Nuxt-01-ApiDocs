@@ -1,8 +1,4 @@
-/**
- * Загрузка данных эндпоинтов (ответ appload).
- * При generate данные лежат в public/staticData/endpoints.json — сначала пробуем их.
- * В dev или если файла нет — fallback на /api/endpoints.
- */
+/** endpoints.json (SSG) или /api/endpoints (dev). */
 export function useEndpoints() {
   const fetcher = async () => {
     try {
