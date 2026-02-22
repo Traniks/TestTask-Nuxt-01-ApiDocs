@@ -1,7 +1,7 @@
 <template>
   <nav class="breadcrumbs">
     <template v-for="(item, i) in items" :key="i">
-      <span v-if="i > 0" class="breadcrumbs-sep">›</span>
+      <span v-if="i > 0" class="breadcrumbs-sep">/</span>
 
       <NuxtLink
         v-if="item.href && !item.active"

@@ -9,7 +9,7 @@ export interface DocEndpoint {
   title: string
   path: string
   method: string
-  /** Краткое описание для меню (рус. из конфига или summary из API) */
+  // Краткое описание для меню (рус. из конфига или summary из API)
   description: string
 }
 
@@ -17,7 +17,7 @@ export interface DocSection {
   id: string
   title: string
   path: string
-  /** Краткое описание секции на русском */
+  // Краткое описание секции на русском
   description: string
   endpoints: DocEndpoint[]
 }
@@ -36,7 +36,7 @@ function humanize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).replace(/_/g, ' ')
 }
 
-/** Название эндпоинта для меню: без дублирования секции; _ → / только если в path несколько сегментов */
+// Название эндпоинта для меню: без дублирования секции; _ → / только если в path несколько сегментов
 function endpointMenuTitle(sectionId: string, urlName: string | undefined, pathKey: string): string {
   const pathPart = pathKey.replace(/^\//, '')
   const raw = urlName ?? pathPart.replace(/\//g, '_')

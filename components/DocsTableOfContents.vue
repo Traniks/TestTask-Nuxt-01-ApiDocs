@@ -2,8 +2,12 @@
   <aside class="toc">
     <h3>Содержание</h3>
     <nav>
-      <ul>
-        <li v-for="item in items" :key="item.href">
+      <ul class="toc-list">
+        <li
+          v-for="item in items"
+          :key="item.href"
+          :class="['toc-item', `toc-item--depth-${item.depth ?? 2}`]"
+        >
           <a :href="item.href">{{ item.label }}</a>
         </li>
       </ul>
@@ -15,6 +19,7 @@
 export interface TocItem {
   href: string
   label: string
+  depth?: number
 }
 
 defineProps<{
@@ -45,7 +50,16 @@ defineProps<{
 }
 
 .toc li {
-  /* margin-bottom: 8px; */
+  margin-bottom: 2px;
+}
+
+.toc-item--depth-2 {
+  padding-left: 0;
+}
+
+.toc-item--depth-3 {
+  padding-left: 14px;
+  font-size: 12px;
 }
 
 .toc a {

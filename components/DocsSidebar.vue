@@ -64,7 +64,7 @@
 const route = useRoute()
 const { groups } = useDocsNavigation()
 
-/** Закрытые секции (по id); изначально все закрыты */
+// Закрытые секции (по id); изначально все закрыты 
 const closedSections = ref<Set<string>>(new Set())
 const closedInitialized = ref(false)
 
@@ -72,7 +72,7 @@ function isSectionOpen(sectionId: string): boolean {
   return !closedSections.value.has(sectionId)
 }
 
-/** При первой загрузке групп — закрыть все секции и открыть секцию текущего роута */
+// При первой загрузке групп — закрыть все секции и открыть секцию текущего роута
 watch(
   () => groups.value.flatMap((g) => g.sections.map((s) => s.id)),
   (ids) => {
@@ -94,7 +94,7 @@ watch(
   { immediate: true }
 )
 
-/** При переходе на страницу — открыть секцию, в которой находится текущий роут */
+// При переходе на страницу — открыть секцию, в которой находится текущий роут
 watch(
   () => route.path,
   (path) => {
@@ -121,14 +121,14 @@ function toggleSection(sectionId: string): void {
 
 const isActive = (path: string) => route.path === path
 
-/** Секция активна (мы на странице секции или одного из её эндпоинтов) */
+// Секция активна (мы на странице секции или одного из её эндпоинтов)
 const isSectionActive = (sectionPath: string) => route.path === sectionPath || route.path.startsWith(sectionPath + '/')
 
-/** Есть ли на текущем пути конкретный эндпоинт (тогда секция не подсвечивается как активная сама по себе) */
+// Есть ли на текущем пути конкретный эндпоинт (тогда секция не подсвечивается как активная сама по себе)
 const currentEndpoint = (section: { endpoints: { path: string }[] }) =>
   section.endpoints.some((e) => e.path === route.path)
 
-/** Ссылка секции: на первый эндпоинт или на индекс секции */
+// Ссылка секции: на первый эндпоинт или на индекс секции
 const sectionFirstPath = (section: { endpoints: { path: string }[]; path: string }) =>
   section.endpoints[0]?.path ?? section.path
 
