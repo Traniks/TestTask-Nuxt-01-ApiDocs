@@ -68,11 +68,11 @@ export function useSearch() {
         searchIndexPending.value = false
       })
 
-    queryContent('/docs').find()
+    queryCollection('docs').all()
       .then((docs) => {
         const items: SearchItem[] = []
         for (const doc of docs) {
-          const docPath = doc._path || ''
+          const docPath = doc.path || ''
           const docTitle = (doc.title as string) || ''
 
           if (docTitle) {
@@ -84,25 +84,16 @@ export function useSearch() {
             })
           }
 
-          const toc = doc.toc as { links?: Array<{ id: string; text: string; depth?: number; children?: Array<{ id: string; text: string; depth?: number }> }> } | undefined
-          if (toc?.links) {
-            for (const link of toc.links) {
+          const body = doc.body as { toc?: { links?: Array<{ id: string; text: string; depth?: number }> } } | undefined
+          const tocLinks = body?.toc?.links
+          if (tocLinks) {
+            for (const link of tocLinks) {
               items.push({
                 title: link.text,
                 description: docTitle || 'Документация',
                 path: `${docPath}#${link.id}`,
                 type: 'heading',
               })
-              if (link.children) {
-                for (const child of link.children) {
-                  items.push({
-                    title: child.text,
-                    description: `${docTitle} — ${link.text}`,
-                    path: `${docPath}#${child.id}`,
-                    type: 'heading',
-                  })
-                }
-              }
             }
           }
         }

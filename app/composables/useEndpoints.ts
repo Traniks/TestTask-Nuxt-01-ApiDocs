@@ -8,6 +8,6 @@ export function useEndpoints() {
     }
   }
   return useAsyncData('api-endpoints', fetcher, {
-    getCachedData: (key) => useNuxtData(key).data.value,
+    getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] ?? nuxtApp.static.data[key],
   })
 }

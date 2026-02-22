@@ -1,6 +1,6 @@
 # Документация API
 
-Статическая документация по эндпоинтам API на Nuxt 3 + Nuxt Content. Данные подтягиваются из внешнего API при сборке, список страниц и навигация строятся автоматически.
+Статическая документация по эндпоинтам API на Nuxt 4 + Nuxt Content 3. Данные подтягиваются из внешнего API при сборке, список страниц и навигация строятся автоматически.
 
 ---
 
@@ -22,7 +22,7 @@
 - Один шаблон страницы эндпоинта: таблица «Информация о запросе», параметры тела из API, опционально Markdown из `content/docs/` (если файла нет — заглушка «Документация в разработке»).
 - Навигация (сайдбар) генерируется из тех же данных: секции, эндпоинты, плашки метода (GET/POST), краткие описания на русском из `config/menu-descriptions.ts`.
 
-Используются: `useEndpoints()` (загрузка данных), `useDocsNavigation()` (дерево групп → секции → эндпоинты), динамический slug в `[...slug].vue`.
+Используются: `useEndpoints()` (загрузка данных), `useDocsNavigation()` (дерево групп → секции → эндпоинты), динамический slug в `app/pages/docs/[...slug].vue`.
 
 ### 3. Оптимизированный простой поиск
 
@@ -59,45 +59,49 @@
 
 ## Что ещё реализовано
 
-- **Навигация из API** — сайдбар с секциями и эндпоинтами, сворачиваемые блоки, плашки метода (GET/POST и т.д.), краткие описания на русском из `config/menu-descriptions.ts`.
-- **Контент** — таблица «Информация о запросе», параметры тела из API, опционально Markdown из `content/docs/` (если нет — заглушка «Документация в разработке»).
-- **Хлебные крошки и TOC** — динамические крошки по пути, оглавление справа из контента + фиксированные пункты (информация о запросе, параметры тела).
-- **Поиск** — компонент в хедере (`app.vue` + `SearchDropdown`), подсказки по эндпоинтам и (в dev) по заголовкам из Nuxt Content; навигация стрелками и Enter.
+- **Навигация из API** — сайдбар с секциями и эндпоинтами, сворачиваемые блоки, плашки метода (GET/POST и т.д.), краткие описания на русском из `app/config/menu-descriptions.ts`.
+- **Контент** — таблица «Информация о запросе», параметры тела из API, опционально Markdown из коллекции `docs` (источник `content/docs/`), описанной в `content.config.ts` (если нет — заглушка «Документация в разработке»).
+- **Хлебные крошки и TOC** — динамические крошки по пути, оглавление справа из контента (Nuxt Content 3: `doc.body.toc.links`) + фиксированные пункты (информация о запросе, параметры тела).
+- **Поиск** — компонент в хедере (`app/app.vue` + `SearchDropdown`), подсказки по эндпоинтам и (в dev) по заголовкам из Nuxt Content; навигация стрелками и Enter.
 
 ---
 
 ## Структура проекта
 
+Исходный код приложения в каталоге `app/` (Nuxt 4). В корне — конфигурация, сервер, контент и статика.
+
 ```
 api-docs/
-├── app.vue                    # Корень: хедер с поиском, <NuxtPage />
-├── config/
-│   └── menu-descriptions.ts   # Русские подписи секций и эндпоинтов
+├── app/
+│   ├── app.vue                 # Корень: хедер с поиском, <NuxtPage />
+│   ├── config/
+│   │   └── menu-descriptions.ts # Русские подписи секций и эндпоинтов
+│   ├── composables/
+│   │   ├── useDocsNavigation.ts # Дерево навигации из API
+│   │   ├── useEndpoints.ts      # Загрузка данных (статический JSON или /api/endpoints)
+│   │   ├── useSearch.ts         # Поиск: индекс из JSON, подсказки, ref-состояние
+│   │   └── useDocToc.ts         # Оглавление из контента (Nuxt Content 3)
+│   ├── components/
+│   │   ├── DocsBreadcrumbs.vue
+│   │   ├── DocsSidebar.vue      # Секции + эндпоинты, сворачивание, описания
+│   │   ├── DocsTableOfContents.vue
+│   │   └── SearchDropdown.vue   # Выпадающий список подсказок поиска
+│   └── pages/
+│       ├── index.vue            # Главная → ссылка на /docs
+│       └── docs/
+│           ├── index.vue        # Список всех эндпоинтов
+│           └── [...slug].vue    # Страница эндпоинта по slug
 ├── content/
 │   └── docs/
-│       └── products-search.md # Markdown для /docs/products/search (по желанию)
-├── composables/
-│   ├── useDocsNavigation.ts   # Дерево навигации из API
-│   ├── useEndpoints.ts       # Загрузка данных (статический JSON или /api/endpoints)
-│   ├── useSearch.ts          # Поиск: индекс из JSON, подсказки, ref-состояние
-│   └── useDocToc.ts           # Оглавление из контента
-├── components/
-│   ├── DocsBreadcrumbs.vue
-│   ├── DocsSidebar.vue       # Секции + эндпоинты, сворачивание, описания
-│   ├── DocsTableOfContents.vue
-│   └── SearchDropdown.vue    # Выпадающий список подсказок поиска
-├── pages/
-│   ├── index.vue             # Главная → ссылка на /docs
-│   └── docs/
-│       ├── index.vue         # Список всех эндпоинтов
-│       └── [...slug].vue     # Страница эндпоинта по slug
+│       └── products-search.md   # Markdown для /docs/products/search (по желанию)
+├── content.config.ts           # Коллекция docs для @nuxt/content 3
 ├── server/
 │   └── api/
-│       └── endpoints.ts      # Прокси к https://main.nointerest.ru/api/appload
+│       └── endpoints.ts         # Прокси к https://main.nointerest.ru/api/appload
 ├── public/
 │   └── staticData/
-│       └── endpoints.json    # Создаётся при generate из ответа appload
-└── nuxt.config.ts            # Хук nitro:config — запрос к API, запись endpoints.json, роуты для prerender
+│       └── endpoints.json       # Создаётся при generate из ответа appload
+└── nuxt.config.ts              # Хук nitro:config — запрос к API, запись endpoints.json, роуты для prerender
 ```
 
 ---
@@ -115,7 +119,7 @@ npm run preview  # Просмотр результата generate
 
 ## Добавление описаний эндпоинтов на русском
 
-В `config/menu-descriptions.ts`:
+В `app/config/menu-descriptions.ts`:
 
 - **sectionDescriptions** — подписи секций (address_hints, auth, products, …).
 - **endpointDescriptions** — подписи эндпоинтов по точному **url_name** из API (например `auth_new_otp_request`, `products_search`).
@@ -132,6 +136,8 @@ npm run preview  # Просмотр результата generate
 
 ## Технологии
 
-- Nuxt 3, Vue 3, TypeScript
-- Nuxt Content (Markdown)
-- Nitro (SSG, prerender, server API)
+- **Nuxt 4** (^4.3.1), **Vue 3** (^3.5), **TypeScript** (^5.9)
+- **@nuxt/content** 3 — Markdown через коллекции и SQLite (`better-sqlite3`), конфигурация в `content.config.ts`
+- **Nitro** — SSG, prerender, server API
+
+Подробности миграции с Nuxt 3 и Content 2 — в [UPGRADE.md](UPGRADE.md).

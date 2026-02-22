@@ -1,16 +1,7 @@
 export default defineNuxtConfig({
-  compatibilityDate: '2026-02-01',
+  compatibilityDate: '2026-02-22',
   devtools: { enabled: true },
   modules: ['@nuxt/content'],
-  content: {
-    documentDriven: false,
-    markdown: {
-      toc: {
-        depth: 3,
-        searchDepth: 3
-      }
-    }
-  },
   nitro: {
     prerender: {
       failOnError: false,

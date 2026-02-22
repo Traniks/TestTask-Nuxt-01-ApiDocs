@@ -43,7 +43,7 @@ export function useDocsNavigation() {
   const { data: apiData } = useEndpoints()
 
   const groups = computed<DocNavGroup[]>(() => {
-    const raw = apiData.value as { page_data?: { unauth?: { paths?: ApiPaths } } } | null
+    const raw = apiData.value as { page_data?: { unauth?: { paths?: ApiPaths } } } | undefined
     const paths = raw?.page_data?.unauth?.paths
     if (!paths || typeof paths !== 'object') return []
 

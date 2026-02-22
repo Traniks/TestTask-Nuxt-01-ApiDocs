@@ -52,7 +52,7 @@ function collectHeadings(nodes: ContentNode[] | undefined, depth = 0): TocItem[]
 }
 
 export function useDocToc(
-  docContent: Ref<Record<string, unknown> | null>,
+  docContent: Ref<Record<string, unknown> | null | undefined>,
   options?: {
     prepend?: TocItem[]
     append?: TocItem[]
@@ -66,8 +66,10 @@ export function useDocToc(
     let fromContent: TocItem[] = []
 
     if (doc) {
-      // Nuxt Content иногда кладёт toc в документ
-      const toc = doc.toc as { links?: Array<{ id: string; text: string; depth?: number }> } | undefined
+      // @nuxt/content v3: TOC доступен через body.toc
+      const body = doc.body as { toc?: { links?: Array<{ id: string; text: string; depth?: number }> }; children?: ContentNode[] } | ContentNode[] | undefined
+      const toc = !Array.isArray(body) ? body?.toc : undefined
+
       if (toc?.links?.length) {
         fromContent = toc.links.map((link) => ({
           href: `#${link.id}`,
@@ -75,8 +77,7 @@ export function useDocToc(
           depth: link.depth ?? 2,
         }))
       } else {
-        // Иначе обходим body (может быть { children } или массив)
-        const body = doc.body as { children?: ContentNode[] } | ContentNode[] | undefined
+        // Fallback: обходим body children (может быть { children } или массив)
         const children = Array.isArray(body) ? body : body?.children
         fromContent = collectHeadings(children)
       }

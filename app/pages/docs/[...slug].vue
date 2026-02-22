@@ -43,13 +43,17 @@
           <!-- Справка: параметры тела запроса -->
           <div class="parameters-section" id="request-body-parameters">
             <details class="parameters-details">
+
               <summary class="parameters-summary">
                 <span class="parameters-summary-title">Справка: параметры тела запроса</span>
                 <span class="parameters-summary-hint">типы полей, обязательность, допустимые значения</span>
               </summary>
+
               <div class="parameters-content">
                 <div class="parameters-table-wrap">
+
                   <table class="parameters-table">
+
                     <thead>
                       <tr>
                         <th>Параметр</th>
@@ -58,6 +62,7 @@
                         <th>Описание</th>
                       </tr>
                     </thead>
+
                     <tbody>
                       <tr
                         v-for="(fieldData, fieldName) in apiData.forms?.[0]?.form_data"
@@ -88,9 +93,11 @@
                         </td>
                       </tr>
                     </tbody>
+                    
                   </table>
                 </div>
               </div>
+
             </details>
           </div>
 
@@ -128,20 +135,20 @@ const section = computed(() => slug.value[0] ?? '')
 const path = computed(() => '/' + (slug.value.slice(1).join('/') || ''))
 
 const apiData = computed(() => {
-  const raw = apiDataRaw.value as { page_data?: { unauth?: { paths?: Record<string, Record<string, ApiEndpoint>> } } } | null
-  if (!raw?.page_data?.unauth?.paths || !section.value) return null
-  return raw.page_data.unauth.paths[section.value]?.[path.value] ?? null
+  const raw = apiDataRaw.value as { page_data?: { unauth?: { paths?: Record<string, Record<string, ApiEndpoint>> } } } | undefined
+  if (!raw?.page_data?.unauth?.paths || !section.value) return undefined
+  return raw.page_data.unauth.paths[section.value]?.[path.value] ?? undefined
 })
 
 const errorMessage = computed(() => {
   if (error.value) return error.value.message || 'Ошибка загрузки данных'
   if (!pending.value && slug.value.length && !apiData.value) return 'Эндпоинт не найден'
-  return null
+  return undefined
 })
 
 const { data: docContent } = await useAsyncData(
-  () => `doc-${contentPath.value}`,
-  () => queryContent(contentPath.value).findOne()
+  `doc-${contentPath.value}`,
+  () => queryCollection('docs').path(contentPath.value).first()
 )
 
 const { tocItems } = useDocToc(docContent, {
@@ -162,9 +169,7 @@ const breadcrumbItems = computed(() => {
   if (!parts.length) return items
   const sectionPart = parts[0]
   const pathSegments = parts.slice(1)
-  // Секция (например Address hints) — одна крошка со ссылкой
   items.push({ label: humanizeSegment(sectionPart), href: '/docs/' + sectionPart })
-  // Путь эндпоинта (например region/search) — одна крошка, не разбиваем на Region и Search
   if (pathSegments.length) {
     const pathLabel = pathSegments.map(humanizeSegment).join(' ')
     items.push({ label: pathLabel, active: true })
@@ -308,7 +313,7 @@ const breadcrumbItems = computed(() => {
   color: #d63384;
 }
 
-.markdown-content :deep(pre) {
+.markdown-content :deep(pre:not(.shiki)) {
   background: #1e1e1e;
   color: #d4d4d4;
   padding: 16px;
@@ -317,10 +322,23 @@ const breadcrumbItems = computed(() => {
   margin: 16px 0;
 }
 
-.markdown-content :deep(pre code) {
+.markdown-content :deep(pre:not(.shiki) code) {
   background: none;
   padding: 0;
   color: inherit;
+}
+
+.markdown-content :deep(pre.shiki) {
+  background: #2d2d2d;
+  color: #fff;
+  padding: 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 16px 0;
+}
+.markdown-content :deep(pre.shiki code),
+.markdown-content :deep(pre.shiki span) {
+  color: #fff;
 }
 
 .markdown-content :deep(table) {
