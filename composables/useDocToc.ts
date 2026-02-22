@@ -75,11 +75,12 @@ export function useDocToc(
 
     if (doc) {
       // Nuxt Content иногда кладёт toc в документ
-      const toc = doc.toc as { links?: Array<{ id: string; text: string }> } | undefined
+      const toc = doc.toc as { links?: Array<{ id: string; text: string; depth?: number }> } | undefined
       if (toc?.links?.length) {
         fromContent = toc.links.map((link) => ({
           href: `#${link.id}`,
           label: link.text,
+          depth: link.depth ?? 2,
         }))
       } else {
         // Иначе обходим body (может быть { children } или массив)
