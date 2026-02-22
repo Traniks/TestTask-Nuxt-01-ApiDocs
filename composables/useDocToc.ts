@@ -12,9 +12,7 @@ type ContentNode = {
   value?: string
 }
 
-/**
- * Извлекает текст из узла и его дочерних элементов (для заголовков).
- */
+// Извлекает текст из узла и его дочерних элементов (для заголовков).
 function getTextFromNode(node: ContentNode): string {
   if (node.type === 'text' && node.value) return node.value
   if (node.children) {
@@ -23,9 +21,7 @@ function getTextFromNode(node: ContentNode): string {
   return ''
 }
 
-/**
- * Генерирует id для якоря (как в Nuxt Content: нижний регистр, пробелы в дефисы).
- */
+// Генерирует id для якоря (как в Nuxt Content: нижний регистр, пробелы в дефисы).
 function slugify(text: string): string {
   return text
     .trim()
@@ -34,9 +30,7 @@ function slugify(text: string): string {
     .replace(/[^\p{L}\p{N}-]/gu, '')
 }
 
-/**
- * Рекурсивно собирает заголовки h2, h3 из body контента.
- */
+// Рекурсивно собирает заголовки h2, h3 из body контента.
 function collectHeadings(nodes: ContentNode[] | undefined, depth = 0): TocItem[] {
   if (!Array.isArray(nodes)) return []
   const items: TocItem[] = []
