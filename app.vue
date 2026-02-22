@@ -1,13 +1,27 @@
 <template>
-  <div class="app">
+  <div class="app" @mousedown="handleOutsideClick">
     <header class="header">
       <NuxtLink to="/" class="header-logo">Документация API</NuxtLink>
-      <div class="header-search">
+      
+      <div class="header-search" ref="searchContainer">
         <input
+          ref="searchInput"
+          v-model="query"
           type="search"
           class="search-input"
           placeholder="Поиск по документации..."
           aria-label="Поиск по документации"
+          autocomplete="off"
+          @focus="isOpen = true"
+          @keydown="onKeydown"
+        />
+
+        <SearchDropdown
+          v-if="showDropdown"
+          :items="results"
+          :loading="searchIndexPending"
+          v-model="selectedIndex"
+          @select="onSelect"
         />
       </div>
     </header>
@@ -17,6 +31,57 @@
     </main>
   </div>
 </template>
+
+<script setup>
+const { query, results, isOpen, showDropdown, searchIndexPending } = useSearch()
+const selectedIndex = ref(-1)
+const searchContainer = ref(null)
+const searchInput = ref(null)
+
+watch(results, () => {
+  selectedIndex.value = -1
+})
+
+function onKeydown(e) {
+  if (!isOpen.value || !results.value.length) {
+    if (e.key === 'Escape') {
+      isOpen.value = false
+      searchInput.value?.blur()
+    }
+    return
+  }
+
+  if (e.key === 'ArrowDown') {
+    e.preventDefault()
+    const len = results.value.length
+    selectedIndex.value = len ? (selectedIndex.value + 1) % len : -1
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault()
+    const len = results.value.length
+    selectedIndex.value = len ? (selectedIndex.value <= 0 ? len - 1 : selectedIndex.value - 1) : -1
+  } else if (e.key === 'Enter') {
+    e.preventDefault()
+    if (selectedIndex.value >= 0 && selectedIndex.value < results.value.length) {
+      onSelect(results.value[selectedIndex.value])
+    }
+  } else if (e.key === 'Escape') {
+    isOpen.value = false
+    searchInput.value?.blur()
+  }
+}
+
+function onSelect(item) {
+  isOpen.value = false
+  query.value = ''
+  navigateTo(item.path)
+}
+
+function handleOutsideClick(e) {
+  if (searchContainer.value && !searchContainer.value.contains(e.target)) {
+    isOpen.value = false
+  }
+}
+</script>
 
 <style>
 * {
@@ -72,6 +137,7 @@ a:hover {
 .header-search {
   flex: 1;
   max-width: 400px;
+  position: relative;
 }
 
 .search-input {
