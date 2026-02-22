@@ -160,14 +160,15 @@ const breadcrumbItems = computed(() => {
   ]
   const parts = slug.value
   if (!parts.length) return items
-  parts.forEach((segment, i) => {
-    const isLast = i === parts.length - 1
-    const href = '/docs/' + parts.slice(0, i + 1).join('/')
-    const label = isLast
-      ? (apiData.value?.url_name ?? humanizeSegment(segment))
-      : humanizeSegment(segment)
-    items.push(isLast ? { label, active: true } : { label, href })
-  })
+  const sectionPart = parts[0]
+  const pathSegments = parts.slice(1)
+  // Секция (например Address hints) — одна крошка со ссылкой
+  items.push({ label: humanizeSegment(sectionPart), href: '/docs/' + sectionPart })
+  // Путь эндпоинта (например region/search) — одна крошка, не разбиваем на Region и Search
+  if (pathSegments.length) {
+    const pathLabel = pathSegments.map(humanizeSegment).join(' ')
+    items.push({ label: pathLabel, active: true })
+  }
   return items
 })
 </script>
@@ -347,6 +348,19 @@ const breadcrumbItems = computed(() => {
 
 .markdown-content :deep(table tr:nth-child(even)) {
   background: #fafafa;
+}
+
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  list-style: none;
+  padding-left: 0;
+  margin: 16px 0;
+}
+
+.markdown-content :deep(ul li),
+.markdown-content :deep(ol li) {
+  margin-bottom: 8px;
+  padding-left: 0;
 }
 
 .parameters-section {
